@@ -1,0 +1,33 @@
+{% extends "core/base.html" %}
+{% block title %}{{ title }} — CS348{% endblock %}
+{% block main_class %}narrow{% endblock %}
+
+{% block topbar %}
+<a class="topbar-link" href="{% url 'home' %}#courses">← Dashboard</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-hd">
+    <span class="card-title">{{ title }}</span>
+    {% if course %}<span class="badge">ID {{ course.course_id }}</span>{% endif %}
+  </div>
+  <div class="card-bd">
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+      {% for field in form %}
+      <div class="form-field">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.errors %}<p class="field-error">{{ field.errors.0 }}</p>{% endif %}
+      </div>
+      {% endfor %}
+      <div class="btn-row">
+        <button class="btn btn-primary" type="submit">Save</button>
+        <a class="btn btn-secondary" href="{% url 'home' %}#courses">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

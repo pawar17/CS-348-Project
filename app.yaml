@@ -1,0 +1,17 @@
+# Set DJANGO_SECRET_KEY and DB_PASSWORD at deploy time (--set-env-vars), not in this file.
+
+runtime: python312
+
+entrypoint: gunicorn -b :$PORT config.wsgi:application
+
+env_variables:
+  DJANGO_DEBUG: "false"
+  DJANGO_ALLOWED_HOSTS: "sacred-woods-436020-h0.appspot.com,sacred-woods-436020-h0.uc.r.appspot.com"
+  DJANGO_CSRF_TRUSTED_ORIGINS: "https://sacred-woods-436020-h0.appspot.com,https://sacred-woods-436020-h0.uc.r.appspot.com"
+
+  CLOUD_SQL_CONNECTION_NAME: "sacred-woods-436020-h0:us-central1:cs348-postgres"
+  DB_NAME: "cs348db"
+  DB_USER: "cs348user"
+
+beta_settings:
+  cloud_sql_instances: "sacred-woods-436020-h0:us-central1:cs348-postgres"

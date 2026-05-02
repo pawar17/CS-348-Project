@@ -1,0 +1,328 @@
+{% extends "core/base.html" %}
+{% block title %}CS348 — Student Enrollment System{% endblock %}
+{% block content %}
+
+<section id="schema" class="section" style="margin-bottom:32px;">
+  <div class="section-hd">
+    <h2 class="section-title">Database Schema</h2>
+    <span class="badge">3 tables</span>
+  </div>
+
+  <div class="card">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Table</th>
+            <th>Columns</th>
+            <th>Primary Key</th>
+            <th>Foreign Keys</th>
+            <th>Other Constraints &amp; Indexes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>students</code></td>
+            <td>
+              <code>student_id</code>,
+              <code>name</code>,
+              <code>age</code>,
+              <code>gpa</code>
+            </td>
+            <td><code>student_id</code></td>
+            <td class="text-muted">—</td>
+            <td>
+              Index <code>students_age_report_idx</code> on <code>age</code><br>
+              Index <code>students_gpa_report_idx</code> on <code>gpa</code>
+            </td>
+          </tr>
+          <tr>
+            <td><code>courses</code></td>
+            <td>
+              <code>course_id</code>,
+              <code>course_name</code>
+            </td>
+            <td><code>course_id</code></td>
+            <td class="text-muted">—</td>
+            <td class="text-muted">—</td>
+          </tr>
+          <tr>
+            <td><code>enrollments</code></td>
+            <td>
+              <code>enrollment_id</code>,
+              <code>student_id</code>,
+              <code>course_id</code>
+            </td>
+            <td><code>enrollment_id</code></td>
+            <td>
+              <code>student_id</code> → <code>students</code> <span class="badge" style="font-size:10px;">CASCADE</span><br>
+              <code>course_id</code> &nbsp;→ <code>courses</code> &nbsp;<span class="badge" style="font-size:10px;">CASCADE</span>
+            </td>
+            <td>
+              UNIQUE <code>(student_id, course_id)</code><br>
+              Index <code>enroll_course_student_idx</code> on <code>(course_id, student_id)</code>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="students" class="section">
+  <div class="section-hd">
+    <h2 class="section-title">Students</h2>
+    <span class="badge">{{ students.count }}</span>
+  </div>
+
+  <div class="section-grid">
+
+    <div class="card">
+      <div class="card-hd"><span class="card-title">Add Student</span></div>
+      <div class="card-bd">
+        <form method="post" action="{% url 'student_create' %}">
+          {% csrf_token %}
+          {% for field in student_form %}
+          <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+          {% endfor %}
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="card-title">All Students</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Name</th><th>Age</th><th>GPA</th><th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in students %}
+            <tr>
+              <td class="text-muted">{{ s.student_id }}</td>
+              <td>{{ s.name }}</td>
+              <td>{{ s.age }}</td>
+              <td>{{ s.gpa }}</td>
+              <td class="col-act">
+                <a class="lnk-edit" href="{% url 'student_update' s.student_id %}">Edit</a>
+                <a class="lnk-del"  href="{% url 'student_delete' s.student_id %}">Delete</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="empty">No students yet — add one.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="courses" class="section">
+  <div class="section-hd">
+    <h2 class="section-title">Courses</h2>
+    <span class="badge">{{ courses.count }}</span>
+  </div>
+
+  <div class="section-grid">
+
+    <div class="card">
+      <div class="card-hd"><span class="card-title">Add Course</span></div>
+      <div class="card-bd">
+        <form method="post" action="{% url 'course_create' %}">
+          {% csrf_token %}
+          {% for field in course_form %}
+          <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+          {% endfor %}
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="card-title">All Courses</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Course Name</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for c in courses %}
+            <tr>
+              <td class="text-muted">{{ c.course_id }}</td>
+              <td>{{ c.course_name }}</td>
+              <td class="col-act">
+                <a class="lnk-edit" href="{% url 'course_update' c.course_id %}">Edit</a>
+                <a class="lnk-del"  href="{% url 'course_delete' c.course_id %}">Delete</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3" class="empty">No courses yet — add one.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="enrollments" class="section">
+  <div class="section-hd">
+    <h2 class="section-title">Enrollments</h2>
+    <span class="badge">{{ enrollments|length }} recent</span>
+  </div>
+
+  <div class="section-grid">
+
+    <div class="card">
+      <div class="card-hd"><span class="card-title">Enroll Student</span></div>
+      <div class="card-bd">
+        <form method="post" action="{% url 'enroll' %}">
+          {% csrf_token %}
+          {% for field in enroll_form %}
+          <div class="form-field">
+            {{ field.label_tag }}
+            {{ field }}
+            {% if field.errors %}<ul class="errorlist">{% for e in field.errors %}<li>{{ e }}</li>{% endfor %}</ul>{% endif %}
+          </div>
+          {% endfor %}
+          <div class="btn-row">
+            <button type="submit" class="btn btn-primary btn-sm">Enroll</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-hd"><span class="card-title">Recent Enrollments</span></div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>#</th><th>Student</th><th>Course</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for e in enrollments %}
+            <tr>
+              <td class="text-muted">{{ e.enrollment_id }}</td>
+              <td>{{ e.student.name }}</td>
+              <td>{{ e.course.course_name }}</td>
+              <td class="col-act">
+                <a class="lnk-del" href="{% url 'enrollment_delete' e.enrollment_id %}">Remove</a>
+              </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="4" class="empty">No enrollments yet.</td></tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<hr class="divider">
+
+<section id="report" class="section">
+  <div class="section-hd">
+    <h2 class="section-title">Student Report</h2>
+    {% if ran_report %}<span class="badge">{{ rows|length }} result{{ rows|length|pluralize }}</span>{% endif %}
+  </div>
+
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-hd"><span class="card-title">Filter</span></div>
+    <div class="card-bd">
+      <form method="get" action="{% url 'home' %}#report">
+        <input type="hidden" name="run_report" value="1">
+        <div class="filter-grid">
+          <div class="form-field">
+            {{ report_form.min_age.label_tag }}
+            {{ report_form.min_age }}
+          </div>
+          <div class="form-field">
+            {{ report_form.max_age.label_tag }}
+            {{ report_form.max_age }}
+          </div>
+          <div class="form-field">
+            {{ report_form.min_gpa.label_tag }}
+            {{ report_form.min_gpa }}
+          </div>
+          <div class="form-field">
+            {{ report_form.max_gpa.label_tag }}
+            {{ report_form.max_gpa }}
+          </div>
+          <div class="form-field full">
+            {{ report_form.course.label_tag }}
+            {{ report_form.course }}
+          </div>
+        </div>
+        <div class="btn-row">
+          <button type="submit" class="btn btn-primary btn-sm">Run Report</button>
+          <a class="btn btn-secondary btn-sm" href="{% url 'home' %}#report">Clear</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  {% if ran_report %}
+
+  <div class="card" style="margin-bottom:12px;">
+    <div class="card-hd"><span class="card-title">SQL preview</span></div>
+    <div class="card-bd">
+      <pre>{{ sql_preview }}</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hd">
+      <span class="card-title">Results</span>
+      <span class="badge">{{ rows|length }} row{{ rows|length|pluralize }}</span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>ID</th><th>Name</th><th>Age</th><th>GPA</th></tr>
+        </thead>
+        <tbody>
+          {% for row in rows %}
+          <tr>
+            <td class="text-muted">{{ row.student_id }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.age }}</td>
+            <td>{{ row.gpa }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="4" class="empty">No students match the selected filters.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  {% endif %}
+</section>
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "core/base.html" %}
+{% block title %}Delete Course — CS348{% endblock %}
+{% block main_class %}narrow{% endblock %}
+
+{% block topbar %}
+<a class="topbar-link" href="{% url 'home' %}#courses">← Dashboard</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-hd"><span class="card-title">Confirm Delete</span></div>
+  <div class="card-bd">
+    <p>
+      Remove <strong>{{ course.course_name }}</strong> (ID&nbsp;{{ course.course_id }})?<br>
+      <span class="hint">Enrollments for this course will be removed too.</span>
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="btn-row">
+        <button class="btn btn-danger" type="submit">Delete</button>
+        <a class="btn btn-secondary" href="{% url 'home' %}#courses">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

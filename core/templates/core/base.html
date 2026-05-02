@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CS348{% endblock %}</title>
+  <style>
+    :root {
+      --c-text:    #111827;
+      --c-muted:   #6B7280;
+      --c-border:  #E5E7EB;
+      --c-bg:      #F3F4F6;
+      --c-surface: #FFFFFF;
+      --c-primary: #111111;
+      --c-accent:  #8B5CF6;
+      --c-success: #16A34A;
+      --c-danger:  #DC2626;
+      --c-warning: #D97706;
+      --accent-bg: rgba(139,92,246,.08);
+      --radius:    6px;
+      --shadow:    0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+      --font-body: Arial, Helvetica, sans-serif;
+      --font-head: Arial, Helvetica, sans-serif;
+      --font-mono: Arial, Helvetica, sans-serif;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.6;
+      background: var(--c-bg);
+      color: var(--c-text);
+      min-height: 100vh;
+    }
+    a { color: var(--c-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: var(--c-primary);
+      height: 48px;
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      gap: 2px;
+    }
+    .topbar-brand {
+      font-family: var(--font-head);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: #fff;
+      text-decoration: none;
+      margin-right: 16px;
+    }
+    .topbar-brand:hover { color: #fff; text-decoration: none; }
+    .topbar-link {
+      font-size: 13px;
+      font-weight: 500;
+      color: rgba(255,255,255,.55);
+      text-decoration: none;
+      padding: 5px 11px;
+      border-radius: 5px;
+      transition: background .12s, color .12s;
+    }
+    .topbar-link:hover { background: rgba(255,255,255,.1); color: #fff; text-decoration: none; }
+    .topbar-spacer { flex: 1; }
+    .topbar-dim { font-size: 12px; color: rgba(255,255,255,.35); }
+    .topbar-dim:hover { color: rgba(255,255,255,.7); background: rgba(255,255,255,.08); }
+
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 24px 72px;
+    }
+    main.narrow { max-width: 580px; padding-top: 40px; }
+
+    .msgs { list-style: none; margin-bottom: 20px; }
+    .msgs li {
+      padding: 9px 14px;
+      border-radius: var(--radius);
+      margin-bottom: 6px;
+      font-size: 13px;
+      border: 1px solid transparent;
+    }
+    .msgs li.success { background: #F0FDF4; border-color: #BBF7D0; color: var(--c-success); }
+    .msgs li.error   { background: #FEF2F2; border-color: #FECACA; color: var(--c-danger);  }
+    .msgs li.info    { background: #EFF6FF; border-color: #BFDBFE; color: #1D4ED8; }
+    .msgs li.warning { background: #FFFBEB; border-color: #FDE68A; color: var(--c-warning); }
+
+    .card {
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+    .card-hd {
+      padding: 11px 16px;
+      border-bottom: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FAFAFA;
+      border-radius: var(--radius) var(--radius) 0 0;
+    }
+    .card-title {
+      font-family: var(--font-head);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+    }
+    .card-bd { padding: 16px; }
+
+    .section { margin-bottom: 40px; scroll-margin-top: 60px; }
+    .section-hd {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font-head);
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--c-primary);
+    }
+    .badge {
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 500;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: 20px;
+      padding: 1px 8px;
+      color: var(--c-muted);
+    }
+    .section-grid {
+      display: grid;
+      grid-template-columns: 256px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    @media (max-width: 720px) { .section-grid { grid-template-columns: 1fr; } }
+    hr.divider { border: none; border-top: 1px solid var(--c-border); margin: 36px 0; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 14px;
+      border-radius: var(--radius);
+      font-family: var(--font-body);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      border: 1px solid transparent;
+      text-decoration: none;
+      transition: all .12s;
+      white-space: nowrap;
+      line-height: 1;
+    }
+    .btn:hover { text-decoration: none; }
+    .btn-primary { background: var(--c-primary); color: #fff; border-color: var(--c-primary); }
+    .btn-primary:hover { background: #333; color: #fff; }
+    .btn-secondary { background: transparent; color: var(--c-text); border-color: var(--c-border); }
+    .btn-secondary:hover { border-color: #9CA3AF; background: var(--c-bg); }
+    .btn-danger { background: var(--c-danger); color: #fff; border-color: var(--c-danger); }
+    .btn-danger:hover { background: #B91C1C; color: #fff; }
+    .btn-sm { padding: 5px 11px; font-size: 12px; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+
+    .form-field { margin-bottom: 10px; }
+    label {
+      display: block;
+      font-family: var(--font-head);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      margin-bottom: 4px;
+    }
+    input[type="text"],
+    input[type="number"],
+    input[type="email"],
+    input[type="password"],
+    select, textarea, .input {
+      display: block;
+      width: 100%;
+      padding: 7px 10px;
+      background: var(--c-surface);
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius);
+      color: var(--c-text);
+      font-size: 13px;
+      font-family: var(--font-body);
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+      max-width: 100%;
+    }
+    input:focus, select:focus, textarea:focus, .input:focus {
+      border-color: var(--c-accent);
+      box-shadow: 0 0 0 3px var(--accent-bg);
+    }
+    .field-error { font-size: 11px; color: var(--c-danger); margin-top: 3px; }
+    .errorlist { list-style: none; }
+    .errorlist li { font-size: 11px; color: var(--c-danger); margin-top: 3px; }
+
+    .table-wrap { overflow-x: auto; border-radius: 0 0 var(--radius) var(--radius); }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    thead th {
+      padding: 9px 12px;
+      text-align: left;
+      font-family: var(--font-head);
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--c-muted);
+      border-bottom: 1px solid var(--c-border);
+      white-space: nowrap;
+      background: #FAFAFA;
+    }
+    tbody tr { border-bottom: 1px solid var(--c-border); transition: background .08s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: #F9FAFB; }
+    td { padding: 9px 12px; vertical-align: middle; }
+    .col-act { white-space: nowrap; text-align: right; }
+    .lnk-edit {
+      font-size: 11px; font-weight: 500;
+      color: #1D4ED8; background: #EFF6FF;
+      padding: 2px 8px; border-radius: 4px; margin-left: 4px;
+    }
+    .lnk-edit:hover { background: #DBEAFE; text-decoration: none; }
+    .lnk-del {
+      font-size: 11px; font-weight: 500;
+      color: var(--c-danger); background: #FEF2F2;
+      padding: 2px 8px; border-radius: 4px; margin-left: 4px;
+    }
+    .lnk-del:hover { background: #FECACA; text-decoration: none; }
+
+    code {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      background: #F3F4F6;
+      color: #7C3AED;
+      padding: .15em .45em;
+      border-radius: 3px;
+    }
+    pre {
+      font-family: var(--font-mono);
+      font-size: 12.5px;
+      line-height: 1.7;
+      background: #1E1B4B;
+      color: #C4B5FD;
+      border: 1px solid #312E81;
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      overflow-x: auto;
+    }
+    pre code { background: none; color: inherit; padding: 0; }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 20px;
+    }
+    .filter-grid .full { grid-column: 1 / -1; }
+    @media (max-width: 500px) { .filter-grid { grid-template-columns: 1fr; } }
+
+    .empty { text-align: center; padding: 28px 16px; color: var(--c-muted); font-size: 13px; }
+    .hint { font-size: 12px; color: var(--c-muted); line-height: 1.5; }
+    .text-muted { color: var(--c-muted); }
+    h1 { font-family: var(--font-head); font-size: 20px; font-weight: 700; margin-bottom: 8px; }
+    h2 { font-family: var(--font-head); font-size: 14px; font-weight: 600; color: var(--c-text); margin-bottom: 12px; }
+    p { margin-bottom: 12px; }
+    p:last-child { margin-bottom: 0; }
+  </style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="topbar-brand" href="{% url 'home' %}">CS348</a>
+  {% block topbar %}
+  <a class="topbar-link" href="{% url 'home' %}#schema">Schema</a>
+  <a class="topbar-link" href="{% url 'home' %}#students">Students</a>
+  <a class="topbar-link" href="{% url 'home' %}#courses">Courses</a>
+  <a class="topbar-link" href="{% url 'home' %}#enrollments">Enrollments</a>
+  <a class="topbar-link" href="{% url 'home' %}#report">Report</a>
+  {% endblock %}
+  <div class="topbar-spacer"></div>
+  <a class="topbar-link topbar-dim" href="/admin/">Admin</a>
+</header>
+
+<main class="{% block main_class %}{% endblock %}">
+  {% if messages %}
+  <ul class="msgs">
+    {% for message in messages %}
+    <li class="{{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+</body>
+</html>

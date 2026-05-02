@@ -1,0 +1,27 @@
+{% extends "core/base.html" %}
+{% block title %}Remove Enrollment — CS348{% endblock %}
+{% block main_class %}narrow{% endblock %}
+
+{% block topbar %}
+<a class="topbar-link" href="{% url 'home' %}#enrollments">← Dashboard</a>
+{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-hd"><span class="card-title">Confirm Remove</span></div>
+  <div class="card-bd">
+    <p>
+      Remove enrollment #{{ enrollment.enrollment_id }}:<br>
+      <strong>{{ enrollment.student.name }}</strong> → <strong>{{ enrollment.course.course_name }}</strong>?<br>
+      <span class="hint">This only removes the enrollment record.</span>
+    </p>
+    <form method="post">
+      {% csrf_token %}
+      <div class="btn-row">
+        <button class="btn btn-danger" type="submit">Remove</button>
+        <a class="btn btn-secondary" href="{% url 'home' %}#enrollments">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
